@@ -15,6 +15,11 @@ import pers.yhy.listener.ShapeListener;
  *
  */
 public class Shape {
+	// THE action of shape
+	public static final int ROTATE = 0;
+	public static final int LEFT = 1;
+	public static final int RIGHT = 2;
+	public static final int DOWN = 3;
 	// store the shape,we use the two-level array to represent a shape,first[] store
 	// the status of shape
 	private int[][] body;
@@ -30,7 +35,6 @@ public class Shape {
 	 * move to left
 	 */
 	public void moveLeft() {
-		System.out.println("move to left");
 		left--;
 	}
 
@@ -38,7 +42,6 @@ public class Shape {
 	 * move to right
 	 */
 	public void moveRight() {
-		System.out.println("move to right");
 		left++;
 	}
 
@@ -46,7 +49,6 @@ public class Shape {
 	 * move to down
 	 */
 	public void moveDown() {
-		System.out.println("move to down");
 		top++;
 	}
 
@@ -54,7 +56,6 @@ public class Shape {
 	 * shape rotation
 	 */
 	public void rotate() {
-		System.out.println("shape rotation");
 		status = (status + 1) % body.length;
 	}
 
@@ -62,7 +63,6 @@ public class Shape {
 	 * show the shape on the game panel
 	 */
 	public void drawMe(Graphics g) {
-		System.out.println("shape drawMe");
 		g.setColor(Color.BLUE);
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -74,7 +74,6 @@ public class Shape {
 			}
 		}
 	}
-
 
 	/**
 	 * get the shape array to judge which one is 1 and then fill this grid
@@ -96,7 +95,7 @@ public class Shape {
 	private class ShapeDriver implements Runnable {
 		@Override
 		public void run() {
-			while (true) {
+			while (shapeListener.isShapeMoveDownable(Shape.this)) {
 				moveDown();
 				shapeListener.shapeMoveDown(Shape.this);
 				try {
@@ -122,12 +121,57 @@ public class Shape {
 		}
 	}
 
+	/**
+	 * set body value
+	 * 
+	 * @param body
+	 */
 	public void setBody(int[][] body) {
 		this.body = body;
 	}
 
+	/**
+	 * set status value
+	 * 
+	 * @param status
+	 */
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	/**
+	 * get shape position info
+	 * 
+	 * @return
+	 */
+	public int getTop() {
+		return top;
+	}
+
+	/**
+	 * get shape position info
+	 * 
+	 * @return
+	 */
+	public int getLeft() {
+		return left;
+	}
+
+	/**
+	 * judge if this point is belonged this shape
+	 * 
+	 * @param x
+	 * @param y
+	 * @param rotate
+	 *            : whether rotate
+	 * @return
+	 */
+	public boolean isMember(int x, int y, boolean rotate) {
+		int tempStatus = status;
+		if (rotate) {
+			tempStatus = (status + 1) % body.length;
+		}
+		return body[tempStatus][y * 4 + x] == 1;
 	}
 
 }

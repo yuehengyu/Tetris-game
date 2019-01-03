@@ -32,16 +32,24 @@ public class Controller extends KeyAdapter implements ShapeListener {
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_UP:
-			shape.rotate();
+			if (ground.isMoveable(shape, Shape.ROTATE)) {
+				shape.rotate();
+			}
 			break;
 		case KeyEvent.VK_DOWN:
-			shape.moveDown();
+			if (isShapeMoveDownable(shape)) {
+				shape.moveDown();
+			}
 			break;
 		case KeyEvent.VK_LEFT:
-			shape.moveLeft();
+			if (ground.isMoveable(shape, Shape.LEFT)) {
+				shape.moveLeft();
+			}
 			break;
 		case KeyEvent.VK_RIGHT:
-			shape.moveRight();
+			if (ground.isMoveable(shape, Shape.RIGHT)) {
+				shape.moveRight();
+			}
 			break;
 		}
 		gamePanel.display(ground, shape);
@@ -61,5 +69,29 @@ public class Controller extends KeyAdapter implements ShapeListener {
 	public void newGame() {
 		shape = shapeFactory.getShape(this);
 
+	}
+
+	/**
+	 * judge shape whether arrive to the bottom
+	 * 
+	 * @param shape
+	 * @return
+	 */
+	@Override
+	public synchronized boolean isShapeMoveDownable(Shape shape) {
+		// if movind dowm shape is different with the current shape,return false,not
+		// become obstacle
+		if (this.shape != shape) {
+			return false;
+		}
+
+		if (ground.isMoveable(shape, Shape.DOWN)) {
+			return true;
+		}
+		ground.acceptShape(this.shape);
+		if (!ground.isFull()) {
+			this.shape = shapeFactory.getShape(this);
+		}
+		return false;
 	}
 }
